@@ -1,8 +1,11 @@
-
+from dotenv import load_dotenv
 from flask import Flask, flash, get_flashed_messages,\
                   redirect, render_template, request,\
                   url_for
 import validators
+import pcycopg2
+
+load_dotenv()
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = '8BYkEfBA6O6donzWlSihBXox7C0sKR6b'
