@@ -1,8 +1,7 @@
-import os
 
 from flask import Flask, flash, get_flashed_messages,\
                   redirect, render_template, request,\
-                  session, url_for
+                  url_for
 import validators
 
 app = Flask(__name__)
