@@ -1,4 +1,3 @@
-  GNU nano 6.4                          page_analyzer/templates/index.html                                    
 <!DOCTYPE html>
 <html lang="ru">
   {% include "head.html" %}
@@ -6,8 +5,56 @@
 
   {% include "header.html" %}
 
-  <main>
-
+  <main class="flex-grow-1">
+    <div class="container-lg mt-3">
+      <h1>Сайт: #### </h1>
+      <div>
+        <table class="table table-bordered table-hover text-nowrap">
+          <tbody>
+            <tr>
+              <td>ID</td>
+              <td>####</td>
+            </tr>
+            <tr>
+              <td>Имя</td>
+              <td>####</td>
+            </tr>
+            <tr>
+              <td>Дата создания</td>
+              <td>####</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <h1 class="mt-5 mb-3">Проверки</h1>
+      <form action="{{ url_for('analyze_website', id=1) }}" method="post">
+        <input type="submit" class="btn btn-primary" value="Запустить проверку">
+      </form>
+      <div>
+        <table class="table table-bordered table-hover mt-2">
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>Код ответа</th>
+              <th>h1</th>
+              <th>title</th>
+              <th>description</th>
+              <th>Дата создания</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>ID</td>
+              <td>Код ответа</td>
+              <td>h1</td>
+              <td>title</td>
+              <td>description</td>
+              <td>Дата создания</td>
+            <tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
   </main>
 
   {% include "footer.html" %}

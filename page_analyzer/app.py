@@ -34,5 +34,12 @@ def show_urls():
 
 @app.get('/urls/<id>')
 def show_one_url(id):
+    # id to be pulled out of DB
     messages = get_flashed_messages(with_categories=True)
     return render_template('one_url.html', messages=messages)
+
+
+@app.post('/urls/<id>')
+def analyze_website(id):
+    # id to be pulled out of DB
+    return redirect(url_for('show_one_url', id=1))
