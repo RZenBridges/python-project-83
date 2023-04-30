@@ -3,8 +3,21 @@
       <a class="navbar-brand text-color-white" href="{{ url_for('get_first')}}">Анализатор страниц</a>
       <ul class="navbar-nav">
         <li class="nav-item">
-          <a class="nav-link" href="#">Сайты</a>
+          <a class="nav-link" href="{{ url_for('show_urls') }}">Сайты</a>
         </li>
       </ul>
     </nav>
   </header>
+    {% if messages %}
+      {% for category, message in messages %}
+        {% if category == 'error' %}
+          <div class="alert alert-danger">
+          {{ message }}
+          </div>
+        {% elif category == 'success' %}
+          <div class="alert alert-info">
+          {{ message }}
+          </div>
+        {% endif %}
+      {% endfor %}
+    {% endif %}

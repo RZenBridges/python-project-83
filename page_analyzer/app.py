@@ -20,5 +20,19 @@ def add_url():
     if not validators.url(URL):
         flash('Некорректный URL', 'error')
         return redirect(url_for('get_first'))
+    # check if url is not already in DB
+    # the url to be added to DB
     flash('Страница успешно добавлена', 'success')
-    return redirect(url_for('get_first'))
+    return redirect(url_for('show_one_url', id=1))
+
+
+@app.get('/urls')
+def show_urls():
+    messages = get_flashed_messages(with_categories=True)
+    return render_template('urls.html', messages=messages)
+
+
+@app.get('/urls/<id>')
+def show_one_url(id):
+    messages = get_flashed_messages(with_categories=True)
+    return render_template('one_url.html', messages=messages)
