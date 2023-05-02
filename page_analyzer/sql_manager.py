@@ -20,7 +20,7 @@ def read_sql():
             all_entries = curs.fetchall()
             conn.close()
             return all_entries
-    except:
+    except psycopg2.Error:
         print('Can`t establish connection to database')
 
 
@@ -33,6 +33,6 @@ def add_to_sql(values):
         conn.commit()
         conn.close()
         return True
-    except:
+    except psycopg2.Error:
         print('Can`t establish connection to database')
         return False

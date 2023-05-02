@@ -16,6 +16,7 @@ def get_today():
 app = Flask(__name__)
 app.config['SECRET_KEY'] = os.environ.get('SECRET')
 
+
 @app.get('/')
 def get_first():
     messages = get_flashed_messages(with_categories=True)
@@ -36,7 +37,7 @@ def add_url():
             return redirect(url_for('show_one_url', id=item['id']))
 
     # the url to be added to DB
-    add_to_sql({'name':URL, 'created_at': get_today()})
+    add_to_sql({'name': URL, 'created_at': get_today()})
 
     flash('Страница успешно добавлена', 'success')
     for item in read_sql():
@@ -49,7 +50,9 @@ def add_url():
 def show_urls():
     messages = get_flashed_messages(with_categories=True)
     all_entries = read_sql()
-    return render_template('urls.html', messages=messages, all_entries=all_entries)
+    return render_template('urls.html',
+                           messages=messages,
+                           all_entries=all_entries)
 
 
 @app.get('/urls/<id>')
@@ -58,7 +61,7 @@ def show_one_url(id):
     entry = {}
     for item in read_sql():
         if item['id'] == int(id):
-            entry=item
+            entry = item
     messages = get_flashed_messages(with_categories=True)
     return render_template('one_url.html', messages=messages, entry=entry)
 
