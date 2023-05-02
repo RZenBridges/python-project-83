@@ -6,7 +6,7 @@
   <div class="container-lg mt-3">
     <h1>Сайты</h1>
     <div class="table-responsive">
-      <table class="table table-bordered table-hover text-nowrap">
+      <table class="table table-bordered table-hover text-nowrap" data_test="urls">
         <thead>
           <tr>
             <th>ID</th>
@@ -16,12 +16,14 @@
           </tr>
         </thead>
         <tbody>
+          {% for item in all_entries %}
           <tr>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
+            <td>{{ item['id'] }}</td>
+            <td><a href=" {{ url_for('show_one_url', id=item['id']) }} ">{{ item['name'] }}</a></td>
+            <td>TBA</td>
+            <td>TBA</td>
           </tr>
+          {% endfor %}
         </tbody>
       </table>
     </div>

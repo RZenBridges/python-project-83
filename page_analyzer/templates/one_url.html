@@ -7,21 +7,21 @@
 
   <main class="flex-grow-1">
     <div class="container-lg mt-3">
-      <h1>Сайт: #### </h1>
+      <h1>Сайт: {{ entry['name'] }} </h1>
       <div>
-        <table class="table table-bordered table-hover text-nowrap">
+        <table class="table table-bordered table-hover text-nowrap" data-test="url">
           <tbody>
             <tr>
               <td>ID</td>
-              <td>####</td>
+              <td>{{ entry.id }}</td>
             </tr>
             <tr>
               <td>Имя</td>
-              <td>####</td>
+              <td>{{ entry.name }}</td>
             </tr>
             <tr>
               <td>Дата создания</td>
-              <td>####</td>
+              <td>{{ entry.created_at }}</td>
             </tr>
           </tbody>
         </table>
@@ -31,7 +31,7 @@
         <input type="submit" class="btn btn-primary" value="Запустить проверку">
       </form>
       <div>
-        <table class="table table-bordered table-hover mt-2">
+        <table class="table table-bordered table-hover mt-2" data_test="checks">
           <thead>
             <tr>
               <th>ID</th>

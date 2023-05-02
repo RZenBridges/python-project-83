@@ -14,3 +14,9 @@ start:
 
 install:
 	poetry install
+
+new-base:
+	createdb urls
+
+drop-base:
+	dropdb urls
