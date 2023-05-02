@@ -22,12 +22,6 @@ INSERT INTO url_checks (url_id, created_at)
 VALUES (%(url_id)s, %(created_at)s);
 """
 
-CROSS_SELECT = """
-SELECT url_checks.created_at FROM urls
-INNER JOIN url_checks ON url.id = url_checks.url_id
-WHERE MAX(id) AND url.id = %(url_id)s;
-"""
-
 
 def read_sql_urls():
     try:
