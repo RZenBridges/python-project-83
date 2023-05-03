@@ -57,7 +57,6 @@ def read_sql_urls():
 def add_to_sql_urls(values):
     try:
         conn = psycopg2.connect(DATABASE_URL)
-        print('DB connection established')
         with conn.cursor(cursor_factory=DictCursor) as curs:
             curs.execute(INSERT_URL, values)
         conn.commit()
@@ -83,7 +82,6 @@ def read_sql_url_checks(url_id):
 def add_to_sql_url_checks(values):
     try:
         conn = psycopg2.connect(DATABASE_URL)
-        print('DB connection established')
         with conn.cursor(cursor_factory=DictCursor) as curs:
             curs.execute(INSERT_URL_CHECKS, values)
         conn.commit()
