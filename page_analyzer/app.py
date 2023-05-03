@@ -90,7 +90,7 @@ def check_url(id):
         flash('Страница успешно проверена', 'success')
         content = get_content(web_address)
         content.update({'url_id': int(id),
-                       'created_at': get_today(),
-                       'status_code': get_status(web_address)})
+                        'created_at': get_today(),
+                        'status_code': get_status(web_address)})
         add_to_sql_url_checks(content)
     return redirect(url_for('show_one_url',  id=int(id)))

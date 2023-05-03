@@ -3,6 +3,7 @@ from requests.exceptions import ConnectionError
 
 from bs4 import BeautifulSoup
 
+
 def get_status(web_address):
     try:
         r = requests.get(web_address)
