@@ -9,7 +9,7 @@ from urllib.parse import urlparse
 
 from .sql_manager import read_sql_urls, add_to_sql_urls,\
                          read_sql_url_checks, add_to_sql_url_checks
-from .http_requests import get_status
+from .http_requests import get_status, get_content
 
 
 def get_today():
@@ -88,7 +88,9 @@ def check_url(id):
         flash('Произошла ошибка при проверке', 'error')
     else:
         flash('Страница успешно проверена', 'success')
-        add_to_sql_url_checks({'url_id': int(id),
-                               'created_at': get_today(),
-                               'status_code': get_status(web_address)})
+        content = get_content(web_address)
+        content.update({'url_id': int(id),
+                       'created_at': get_today(),
+                       'status_code': get_status(web_address)})
+        add_to_sql_url_checks(content)
     return redirect(url_for('show_one_url',  id=int(id)))

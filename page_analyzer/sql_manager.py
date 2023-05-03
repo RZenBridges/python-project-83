@@ -22,8 +22,8 @@ VALUES (%(name)s, %(created_at)s);
 
 SELECT_URL_CHECKS = "SELECT * FROM url_checks WHERE url_id = (%(url_id)s);"
 INSERT_URL_CHECKS = """
-INSERT INTO url_checks (url_id, status_code, created_at)
-VALUES (%(url_id)s, %(status_code)s, %(created_at)s);
+INSERT INTO url_checks (url_id, status_code, h1, title, description, created_at)
+VALUES (%(url_id)s, %(status_code)s, %(h1)s, %(title)s, %(description)s, %(created_at)s);
 """
 
 
