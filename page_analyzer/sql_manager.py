@@ -6,9 +6,13 @@ from psycopg2.extras import DictCursor
 DATABASE_URL = os.environ.get('DATABASE_URL')
 
 SELECT_URL = """
-SELECT urls.*, MAX(url_checks.created_at) AS check_made_at FROM urls
+SELECT
+    urls.*,
+    status_code,
+    MAX(url_checks.created_at) AS check_made_at
+FROM urls
 LEFT JOIN url_checks ON urls.id = url_checks.url_id
-GROUP BY urls.id;
+GROUP BY urls.id, status_code;
 """
 
 INSERT_URL = """
@@ -18,8 +22,8 @@ VALUES (%(name)s, %(created_at)s);
 
 SELECT_URL_CHECKS = "SELECT * FROM url_checks WHERE url_id = (%(url_id)s);"
 INSERT_URL_CHECKS = """
-INSERT INTO url_checks (url_id, created_at)
-VALUES (%(url_id)s, %(created_at)s);
+INSERT INTO url_checks (url_id, status_code, created_at)
+VALUES (%(url_id)s, %(status_code)s, %(created_at)s);
 """
 
 

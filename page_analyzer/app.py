@@ -5,9 +5,11 @@ from flask import Flask, flash, get_flashed_messages,\
                   redirect, render_template, request,\
                   url_for
 import validators
+from urllib.parse import urlparse
 
 from .sql_manager import read_sql_urls, add_to_sql_urls,\
                          read_sql_url_checks, add_to_sql_url_checks
+from .http_requests import get_status
 
 
 def get_today():
@@ -26,23 +28,28 @@ def get_first():
 
 @app.post('/')
 def add_url():
-    URL = request.form.get('url')
-    if not validators.url(URL):
+    url_for_check = '://'.join(
+        list(
+            urlparse(
+                request.form.get('url').lower()
+            )
+        )[:2]
+    )
+    if not validators.url(url_for_check):
         flash('Некорректный URL', 'error')
         return redirect(url_for('get_first'))
 
     # check if url is not already in DB
     for item in read_sql_urls():
-        if URL == item['name']:
+        if url_for_check == item['name']:
             flash('Страница уже существует', 'success')
             return redirect(url_for('show_one_url', id=item['id']))
 
     # the url to be added to DB
-    add_to_sql_urls({'name': URL, 'created_at': get_today()})
-
+    add_to_sql_urls({'name': url_for_check, 'created_at': get_today()})
     flash('Страница успешно добавлена', 'success')
     for item in read_sql_urls():
-        if item['name'] == URL:
+        if item['name'] == url_for_check:
             entry = item
     return redirect(url_for('show_one_url', id=entry['id']))
 
@@ -74,5 +81,13 @@ def show_one_url(id):
 @app.post('/urls/<id>/checks')
 def check_url(id):
     # the url_check to be added to DB
-    add_to_sql_url_checks({'url_id': int(id), 'created_at': get_today()})
+    for item in read_sql_urls():
+        if item['id'] == int(id):
+            web_address = item['name']
+    if get_status(web_address) == 404:
+        flash('Произошла ошибка при проверке', 'error')
+    else:
+        add_to_sql_url_checks({'url_id': int(id),
+                               'created_at': get_today(),
+                               'status_code': get_status(web_address)})
     return redirect(url_for('show_one_url',  id=int(id)))
