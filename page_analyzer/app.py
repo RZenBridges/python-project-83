@@ -87,6 +87,7 @@ def check_url(id):
     if get_status(web_address) == 404:
         flash('Произошла ошибка при проверке', 'error')
     else:
+        flash('Страница успешно проверена', 'success')
         add_to_sql_url_checks({'url_id': int(id),
                                'created_at': get_today(),
                                'status_code': get_status(web_address)})
