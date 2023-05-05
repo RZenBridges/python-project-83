@@ -18,8 +18,9 @@ GROUP BY urls.id, status_code;
 
 INSERT_URL = """
 INSERT INTO urls (name, created_at)
-VALUES (%(name)s, %(created_at)s
-);
+VALUES (%(name)s, %(created_at)s)
+RETURNING id
+;
 """
 
 SELECT_URL_CHECKS = "SELECT * FROM url_checks WHERE url_id = (%(url_id)s);"
@@ -56,11 +57,13 @@ def read_sql_urls():
 
 def add_to_sql_urls(values):
     try:
-        with psycopg2.conenct(DATABASE_URL) as conn:
+        with psycopg2.connect(DATABASE_URL) as conn:
             with conn.cursor(cursor_factory=DictCursor) as curs:
                 values.update({'created_at': str(dt.datetime.now().date())})
                 curs.execute(INSERT_URL, values)
+                returned_id = curs.fetchone()['id']
             conn.commit()
+        return returned_id
     except psycopg2.Error:
         print('Can`t establish connection to database')
 

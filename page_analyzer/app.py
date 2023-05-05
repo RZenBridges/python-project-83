@@ -40,12 +40,9 @@ def add_url():
             return redirect(url_for('show_one_url', id=item['id']))
 
     # add the url to DB
-    add_to_sql_urls({'name': url_for_check})
+    returned_id = add_to_sql_urls({'name': url_for_check})
     flash('Страница успешно добавлена', 'success')
-    for item in read_sql_urls():
-        if item['name'] == url_for_check:
-            entry = item
-    return redirect(url_for('show_one_url', id=entry['id']))
+    return redirect(url_for('show_one_url', id=returned_id))
 
 
 # all urls - GET
@@ -81,9 +78,9 @@ def check_url(id):
     if get_status(web_address) == 404:
         flash('Произошла ошибка при проверке', 'error')
     else:
-        flash('Страница успешно проверена', 'success')
         content = get_content(web_address)
         content.update({'url_id': id,
                         'status_code': get_status(web_address)})
         add_to_sql_url_checks(content)
+        flash('Страница успешно проверена', 'success')
     return redirect(url_for('show_one_url',  id=id))
