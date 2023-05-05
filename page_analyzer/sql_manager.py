@@ -1,4 +1,5 @@
 import os
+import datetime as dt
 
 import psycopg2
 from psycopg2.extras import DictCursor
@@ -58,6 +59,7 @@ def add_to_sql_urls(values):
     try:
         conn = psycopg2.connect(DATABASE_URL)
         with conn.cursor(cursor_factory=DictCursor) as curs:
+            values.update({'created_at': str(dt.datetime.now().date())})
             curs.execute(INSERT_URL, values)
         conn.commit()
         conn.close()
@@ -83,6 +85,7 @@ def add_to_sql_url_checks(values):
     try:
         conn = psycopg2.connect(DATABASE_URL)
         with conn.cursor(cursor_factory=DictCursor) as curs:
+            values.update({'created_at': str(dt.datetime.now().date())})
             curs.execute(INSERT_URL_CHECKS, values)
         conn.commit()
         conn.close()

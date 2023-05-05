@@ -1,19 +1,12 @@
 import os
-import datetime as dt
 
-from flask import Flask, flash, get_flashed_messages,\
-                  redirect, render_template, request,\
-                  url_for
+from flask import Flask, flash, redirect, render_template, request, url_for
 import validators
 from urllib.parse import urlparse
 
 from .sql_manager import read_sql_urls, add_to_sql_urls,\
                          read_sql_url_checks, add_to_sql_url_checks
 from .http_requests import get_status, get_content
-
-
-def get_today():
-    return dt.datetime.now().date().strftime("%Y-%m-%d")
 
 
 app = Flask(__name__)
@@ -23,25 +16,20 @@ app.config['SECRET_KEY'] = os.environ.get('SECRET')
 # main page - GET
 @app.get('/')
 def get_first():
-    messages = get_flashed_messages(with_categories=True)
-    return render_template('index.html', messages=messages)
+    return render_template('index.html')
 
 
 # main page - POST
-@app.post('/')
+@app.post('/urls')
 def add_url():
     # url from the form is processed
-    url_for_check = '://'.join(
-        list(
-            urlparse(
-                request.form.get('url').lower()
-            )
-        )[:2]
-    )
+    raw_request = request.form.get('url')
+    url = urlparse(raw_request.lower())
+    url_for_check = f'{url.scheme}://{url.netloc}'
     # check if url has a correct features
     if not validators.url(url_for_check):
         flash('Некорректный URL', 'error')
-        return redirect(url_for('get_first'))
+        return render_template('index.html', user_input=raw_request)
 
     # check if url is not already in DB
     for item in read_sql_urls():
@@ -50,7 +38,7 @@ def add_url():
             return redirect(url_for('show_one_url', id=item['id']))
 
     # add the url to DB
-    add_to_sql_urls({'name': url_for_check, 'created_at': get_today()})
+    add_to_sql_urls({'name': url_for_check})
     flash('Страница успешно добавлена', 'success')
     for item in read_sql_urls():
         if item['name'] == url_for_check:
@@ -62,43 +50,38 @@ def add_url():
 @app.get('/urls')
 def show_urls():
     # show all the urls that were added by users
-    messages = get_flashed_messages(with_categories=True)
     all_entries = read_sql_urls()
     return render_template('urls.html',
-                           messages=messages,
                            all_entries=all_entries)
 
 
 # one url - GET
-@app.get('/urls/<id>')
+@app.get('/urls/<int:id>')
 def show_one_url(id):
     # ID is pulled out of DB
     entry = {}
     for item in read_sql_urls():
-        if item['id'] == int(id):
+        if item['id'] == id:
             entry = item
-            entry_checks = read_sql_url_checks({'url_id': int(id)})
-    messages = get_flashed_messages(with_categories=True)
+            entry_checks = read_sql_url_checks({'url_id': id})
     return render_template('one_url.html',
-                           messages=messages,
                            entry=entry,
                            entry_checks=entry_checks)
 
 
 # check one url - POST
-@app.post('/urls/<id>/checks')
+@app.post('/urls/<int:id>/checks')
 def check_url(id):
     # the url check to be added to DB
     for item in read_sql_urls():
-        if item['id'] == int(id):
+        if item['id'] == id:
             web_address = item['name']
     if get_status(web_address) == 404:
         flash('Произошла ошибка при проверке', 'error')
     else:
         flash('Страница успешно проверена', 'success')
         content = get_content(web_address)
-        content.update({'url_id': int(id),
-                        'created_at': get_today(),
+        content.update({'url_id': id,
                         'status_code': get_status(web_address)})
         add_to_sql_url_checks(content)
-    return redirect(url_for('show_one_url',  id=int(id)))
+    return redirect(url_for('show_one_url',  id=id))
