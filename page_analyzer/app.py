@@ -29,7 +29,9 @@ def add_url():
     # check if url has a correct features
     if not validators.url(url_for_check):
         flash('Некорректный URL', 'error')
-        return render_template('index.html', user_input=raw_request)
+        if raw_request == '':
+            flash('URL обязателен', 'error')
+        return render_template('index.html', user_input=raw_request), 422
 
     # check if url is not already in DB
     for item in read_sql_urls():
