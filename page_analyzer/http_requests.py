@@ -7,10 +7,9 @@ from bs4 import BeautifulSoup
 def get_status(web_address):
     try:
         r = requests.get(web_address)
-        if r.raise_for_status is None:
-            return r.status_code
-    except RequestException as r:
-        print(r)
+        r.raise_for_status()
+        return r.status_code
+    except RequestException as e:
         return 404
 
 
