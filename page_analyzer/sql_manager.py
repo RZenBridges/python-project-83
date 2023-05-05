@@ -53,68 +53,50 @@ VALUES (
 
 
 def read_sql_urls_by_name(name):
-    try:
-        with psycopg2.connect(DATABASE_URL) as conn:
-            with conn.cursor(cursor_factory=DictCursor) as curs:
-                curs.execute(SELECT_URL_BY_NAME, {'name': name})
-                found_item = curs.fetchone()
-            return found_item
-    except psycopg2.Error:
-        print('Can`t establish connection to database')
+    with psycopg2.connect(DATABASE_URL) as conn:
+        with conn.cursor(cursor_factory=DictCursor) as curs:
+            curs.execute(SELECT_URL_BY_NAME, {'name': name})
+            found_item = curs.fetchone()
+        return found_item
 
 
 def read_sql_urls_by_id(id):
-    try:
-        with psycopg2.connect(DATABASE_URL) as conn:
-            with conn.cursor(cursor_factory=DictCursor) as curs:
-                curs.execute(SELECT_URL_BY_ID, {'id': id})
-                found_item = curs.fetchone()
-            return found_item
-    except psycopg2.Error:
-        print('Can`t establish connection to database')
+    with psycopg2.connect(DATABASE_URL) as conn:
+        with conn.cursor(cursor_factory=DictCursor) as curs:
+            curs.execute(SELECT_URL_BY_ID, {'id': id})
+            found_item = curs.fetchone()
+        return found_item
 
 
 def read_sql_urls():
-    try:
-        with psycopg2.connect(DATABASE_URL) as conn:
-            with conn.cursor(cursor_factory=DictCursor) as curs:
-                curs.execute(SELECT_URLS_AND_CHECKS)
-                all_entries = curs.fetchall()
-            return all_entries
-    except psycopg2.Error:
-        print('Can`t establish connection to database')
+    with psycopg2.connect(DATABASE_URL) as conn:
+        with conn.cursor(cursor_factory=DictCursor) as curs:
+            curs.execute(SELECT_URLS_AND_CHECKS)
+            all_entries = curs.fetchall()
+        return all_entries
 
 
 def add_to_sql_urls(values):
-    try:
-        with psycopg2.connect(DATABASE_URL) as conn:
-            with conn.cursor(cursor_factory=DictCursor) as curs:
-                values.update({'created_at': dt.datetime.now().date()})
-                curs.execute(INSERT_URL, values)
-                returned_id = curs.fetchone()['id']
-            conn.commit()
-        return returned_id
-    except psycopg2.Error:
-        print('Can`t establish connection to database')
+    with psycopg2.connect(DATABASE_URL) as conn:
+        with conn.cursor(cursor_factory=DictCursor) as curs:
+            values.update({'created_at': dt.datetime.now().date()})
+            curs.execute(INSERT_URL, values)
+            returned_id = curs.fetchone()['id']
+        conn.commit()
+    return returned_id
 
 
 def read_sql_url_checks(url_id):
-    try:
-        with psycopg2.connect(DATABASE_URL) as conn:
-            with conn.cursor(cursor_factory=DictCursor) as curs:
-                curs.execute(SELECT_URL_CHECKS, url_id)
-                all_entries = curs.fetchall()
-            return all_entries
-    except psycopg2.Error:
-        print('Can`t establish connection to database')
+    with psycopg2.connect(DATABASE_URL) as conn:
+        with conn.cursor(cursor_factory=DictCursor) as curs:
+            curs.execute(SELECT_URL_CHECKS, url_id)
+            all_entries = curs.fetchall()
+        return all_entries
 
 
 def add_to_sql_url_checks(values):
-    try:
-        with psycopg2.connect(DATABASE_URL) as conn:
-            with conn.cursor(cursor_factory=DictCursor) as curs:
-                values.update({'created_at': dt.datetime.now().date()})
-                curs.execute(INSERT_URL_CHECKS, values)
-            conn.commit()
-    except psycopg2.Error:
-        print('Can`t establish connection to database')
+    with psycopg2.connect(DATABASE_URL) as conn:
+        with conn.cursor(cursor_factory=DictCursor) as curs:
+            values.update({'created_at': dt.datetime.now().date()})
+            curs.execute(INSERT_URL_CHECKS, values)
+        conn.commit()
