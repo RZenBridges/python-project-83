@@ -5,7 +5,8 @@ import validators
 from urllib.parse import urlparse
 
 from .sql_manager import read_sql_urls, add_to_sql_urls,\
-                         read_sql_url_checks, add_to_sql_url_checks
+                         read_sql_url_checks, add_to_sql_url_checks,\
+                         read_sql_urls_by_id
 from .http_requests import get_status, get_content
 
 
@@ -39,7 +40,7 @@ def add_url():
             flash('Страница уже существует', 'success')
             return redirect(url_for('show_one_url', id=item['id']))
 
-    # add the url to DB
+    # add the url toflash('Страница успешно проверена', 'success')
     returned_id = add_to_sql_urls({'name': url_for_check})
     flash('Страница успешно добавлена', 'success')
     return redirect(url_for('show_one_url', id=returned_id))
@@ -59,12 +60,10 @@ def show_urls():
 def show_one_url(id):
     # ID is pulled out of DB
     entry = {}
-    for item in read_sql_urls():
-        if item['id'] == id:
-            entry = item
-            entry_checks = read_sql_url_checks({'url_id': id})
+    item = read_sql_urls_by_id(id)
+    entry_checks = read_sql_url_checks({'url_id': item['id']})
     return render_template('one_url.html',
-                           entry=entry,
+                           entry=item,
                            entry_checks=entry_checks)
 
 
@@ -72,9 +71,8 @@ def show_one_url(id):
 @app.post('/urls/<int:id>/checks')
 def check_url(id):
     # the url check to be added to DB
-    for item in read_sql_urls():
-        if item['id'] == id:
-            web_address = item['name']
+    item = read_sql_urls_by_id(id)
+    web_address = item['name']
     if get_status(web_address) == 404:
         flash('Произошла ошибка при проверке', 'error')
     else:

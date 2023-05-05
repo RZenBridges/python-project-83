@@ -6,7 +6,11 @@ from psycopg2.extras import DictCursor
 
 DATABASE_URL = os.environ.get('DATABASE_URL')
 
-SELECT_URL = """
+SELECT_URL_BY_ID = """
+SELECT * FROM urls WHERE urls.id = %(id)s
+"""
+
+SELECT_URLS_AND_CHECKS = """
 SELECT
     urls.*,
     status_code,
@@ -43,12 +47,22 @@ VALUES (
 );
 """
 
+def read_sql_urls_by_id(id):
+    try:
+        with psycopg2.connect(DATABASE_URL) as conn:
+            with conn.cursor(cursor_factory=DictCursor) as curs:
+                curs.execute(SELECT_URL_BY_ID, {'id': id})
+                found_item = curs.fetchone()
+            return found_item
+    except psycopg2.Error:
+        print('Can`t establish connection to database')
+
 
 def read_sql_urls():
     try:
         with psycopg2.connect(DATABASE_URL) as conn:
             with conn.cursor(cursor_factory=DictCursor) as curs:
-                curs.execute(SELECT_URL)
+                curs.execute(SELECT_URLS_AND_CHECKS)
                 all_entries = curs.fetchall()
             return all_entries
     except psycopg2.Error:
@@ -59,7 +73,7 @@ def add_to_sql_urls(values):
     try:
         with psycopg2.connect(DATABASE_URL) as conn:
             with conn.cursor(cursor_factory=DictCursor) as curs:
-                values.update({'created_at': str(dt.datetime.now().date())})
+                values.update({'created_at': dt.datetime.now().date()})
                 curs.execute(INSERT_URL, values)
                 returned_id = curs.fetchone()['id']
             conn.commit()
@@ -83,7 +97,7 @@ def add_to_sql_url_checks(values):
     try:
         with psycopg2.connect(DATABASE_URL) as conn:
             with conn.cursor(cursor_factory=DictCursor) as curs:
-                values.update({'created_at': str(dt.datetime.now().date())})
+                values.update({'created_at': dt.datetime.now().date()})
                 curs.execute(INSERT_URL_CHECKS, values)
             conn.commit()
     except psycopg2.Error:
