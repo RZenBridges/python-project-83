@@ -10,6 +10,7 @@ def get_status(web_address):
         r.raise_for_status()
         return r.status_code
     except RequestException as e:
+        print(e)
         return 404
 
 
