@@ -11,7 +11,7 @@ from .http_requests import get_status, get_content
 
 
 app = Flask(__name__)
-app.config['SECRET_KEY'] = os.environ.get('SECRET')
+app.config['SECRET_KEY'] = os.environ.get('SECRET','secret_key')
 
 
 # main page - GET
