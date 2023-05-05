@@ -6,7 +6,7 @@ from urllib.parse import urlparse
 
 from .sql_manager import read_sql_urls, add_to_sql_urls,\
                          read_sql_url_checks, add_to_sql_url_checks,\
-                         read_sql_urls_by_id
+                         read_sql_urls_by_id, read_sql_urls_by_name
 from .http_requests import get_status, get_content
 
 
@@ -35,10 +35,10 @@ def add_url():
         return render_template('index.html', user_input=raw_request), 422
 
     # check if url is not already in DB
-    for item in read_sql_urls():
-        if url_for_check == item['name']:
-            flash('Страница уже существует', 'success')
-            return redirect(url_for('show_one_url', id=item['id']))
+    item = read_sql_urls_by_name(url_for_check)
+    if item:
+        flash('Страница уже существует', 'success')
+        return redirect(url_for('show_one_url', id=item['id']))
 
     # add the url toflash('Страница успешно проверена', 'success')
     returned_id = add_to_sql_urls({'name': url_for_check})

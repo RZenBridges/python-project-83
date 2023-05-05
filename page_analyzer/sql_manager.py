@@ -10,6 +10,10 @@ SELECT_URL_BY_ID = """
 SELECT * FROM urls WHERE urls.id = %(id)s
 """
 
+SELECT_URL_BY_NAME = """
+SELECT * FROM urls WHERE urls.name = %(name)s
+"""
+
 SELECT_URLS_AND_CHECKS = """
 SELECT
     urls.*,
@@ -46,6 +50,17 @@ VALUES (
     %(created_at)s
 );
 """
+
+
+def read_sql_urls_by_name(name):
+    try:
+        with psycopg2.connect(DATABASE_URL) as conn:
+            with conn.cursor(cursor_factory=DictCursor) as curs:
+                curs.execute(SELECT_URL_BY_NAME, {'name': name})
+                found_item = curs.fetchone()
+            return found_item
+    except psycopg2.Error:
+        print('Can`t establish connection to database')
 
 
 def read_sql_urls_by_id(id):
