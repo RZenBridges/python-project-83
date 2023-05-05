@@ -47,6 +47,7 @@ VALUES (
 );
 """
 
+
 def read_sql_urls_by_id(id):
     try:
         with psycopg2.connect(DATABASE_URL) as conn:

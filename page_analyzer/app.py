@@ -59,7 +59,6 @@ def show_urls():
 @app.get('/urls/<int:id>')
 def show_one_url(id):
     # ID is pulled out of DB
-    entry = {}
     item = read_sql_urls_by_id(id)
     entry_checks = read_sql_url_checks({'url_id': item['id']})
     return render_template('one_url.html',
