@@ -1,7 +1,4 @@
-ifneq (,$(wildcard ./.env))
-    include .env
-    export
-endif
+include .env
 
 dev:
 	poetry run flask --app page_analyzer:app run

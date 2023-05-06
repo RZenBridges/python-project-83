@@ -3,12 +3,14 @@ import os
 from flask import Flask, flash, redirect, render_template, request, url_for
 import validators
 from urllib.parse import urlparse
+from dotenv import load_dotenv
 
 from .sql_manager import read_sql_urls, add_to_sql_urls,\
                          read_sql_url_checks, add_to_sql_url_checks,\
                          read_sql_urls_by_id, read_sql_urls_by_name
 from .http_requests import get_status, get_content
 
+load_dotenv()
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = os.environ.get('SECRET', 'secret_key')
@@ -81,3 +83,7 @@ def check_url(id):
         add_to_sql_url_checks(content)
         flash('Страница успешно проверена', 'success')
     return redirect(url_for('show_one_url',  id=id))
+
+
+#if __name__ == '__main__':
+#    app.run(port=os.environ.get('PORT'))

@@ -1,9 +1,11 @@
 import os
 import datetime as dt
 
+from dotenv import load_dotenv
 import psycopg2
 from psycopg2.extras import DictCursor
 
+load_dotenv()
 DATABASE_URL = os.environ.get('DATABASE_URL')
 
 SELECT_URL_BY_ID = """
