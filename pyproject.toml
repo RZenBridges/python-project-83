@@ -14,10 +14,10 @@ validators = "^0.20.0"
 psycopg2-binary = "^2.9.6"
 requests = "^2.29.0"
 beautifulsoup4 = "^4.12.2"
+python-dotenv = "^1.0.0"
 
 
 [tool.poetry.group.dev.dependencies]
-python-dotenv = "^1.0.0"
 flake8 = "^6.0.0"
 
 [build-system]
