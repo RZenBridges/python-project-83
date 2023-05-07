@@ -18,12 +18,23 @@ SELECT * FROM urls WHERE urls.name = %(name)s
 
 SELECT_URLS_AND_CHECKS = """
 SELECT
-    urls.*,
+  DISTINCT ON (urls.id)
+    urls.id,
+    urls.name,
     status_code,
-    MAX(url_checks.created_at) AS check_made_at
+    url_checks.created_at AS check_made_at
 FROM urls
-LEFT JOIN url_checks ON urls.id = url_checks.url_id
-GROUP BY urls.id, status_code;
+LEFT JOIN
+  url_checks
+    ON urls.id = url_checks.url_id
+GROUP BY
+    urls.id,
+    url_checks.id,
+    status_code
+ORDER BY
+    urls.id,
+    url_checks.id DESC
+;
 """
 
 INSERT_URL = """
