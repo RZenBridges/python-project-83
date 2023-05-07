@@ -82,7 +82,3 @@ def check_url(id):
         add_to_sql_url_checks(content)
         flash('Страница успешно проверена', 'success')
     return redirect(url_for('show_one_url', id=id))
-
-
-if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=os.environ.get('PORT'))
