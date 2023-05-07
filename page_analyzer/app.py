@@ -5,9 +5,8 @@ import validators
 from urllib.parse import urlparse
 from dotenv import load_dotenv
 
-from .sql_manager import read_sql_urls, add_to_sql_urls,\
-                         read_sql_url_checks, add_to_sql_url_checks,\
-                         read_sql_urls_by_id, read_sql_urls_by_name
+from .sql_manager import read_sql_urls, add_to_sql_urls, read_sql_url_checks,\
+    add_to_sql_url_checks, read_sql_urls_by_id, read_sql_urls_by_name
 from .http_requests import get_status, get_content
 
 load_dotenv()
@@ -82,7 +81,7 @@ def check_url(id):
                         'status_code': get_status(web_address)})
         add_to_sql_url_checks(content)
         flash('Страница успешно проверена', 'success')
-    return redirect(url_for('show_one_url',  id=id))
+    return redirect(url_for('show_one_url', id=id))
 
 
 if __name__ == '__main__':
