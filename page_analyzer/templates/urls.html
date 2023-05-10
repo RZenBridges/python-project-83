@@ -21,7 +21,7 @@
             <tr>
               <td>{{ item.id }}</td>
               <td><a href=" {{ url_for('show_one_url', id=item.id) }} ">{{ item.name }}</a></td>
-              <td>{{ item.check_made_at|default('', true) }}</td>
+              <td>{{ item.created_at.date() if item.created_at }}</td>
               <td>{{ item.status_code|default('', true) }}</td>
             </tr>
             {% endfor %}

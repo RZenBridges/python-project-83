@@ -6,8 +6,8 @@ from urllib.parse import urlparse
 from dotenv import load_dotenv
 import psycopg2
 
-from .sql_manager import read_sql_urls, add_to_sql_urls, read_sql_url_checks,\
-    add_to_sql_url_checks, read_sql_urls_by_id, read_sql_urls_by_name
+from .database import get_urls, add_to_urls, get_url_checks,\
+    add_to_url_checks, get_url_by_id, get_url_by_name
 from .http_requests import get_status, get_content
 
 load_dotenv()
@@ -39,13 +39,13 @@ def add_url():
 
     with psycopg2.connect(DATABASE_URL) as conn:
         # check if url is not already in DB
-        item = read_sql_urls_by_name(conn, url_for_check)
+        item = get_url_by_name(conn, url_for_check)
         if item:
             flash('Страница уже существует', 'success')
             return redirect(url_for('show_one_url', id=item['id']))
 
         # add the url toflash('Страница успешно проверена', 'success')
-        returned_id = add_to_sql_urls(conn, {'name': url_for_check})
+        returned_id = add_to_urls(conn, {'name': url_for_check})
         flash('Страница успешно добавлена', 'success')
     return redirect(url_for('show_one_url', id=returned_id))
 
@@ -55,7 +55,7 @@ def add_url():
 def show_urls():
     with psycopg2.connect(DATABASE_URL) as conn:
         # show all the urls that were added by users
-        all_entries = read_sql_urls(conn)
+        all_entries = get_urls(conn)
     return render_template('urls.html',
                            all_entries=all_entries)
 
@@ -65,8 +65,8 @@ def show_urls():
 def show_one_url(id):
     with psycopg2.connect(DATABASE_URL) as conn:
         # ID is pulled out of DB
-        item = read_sql_urls_by_id(conn, id)
-        entry_checks = read_sql_url_checks(conn, {'url_id': item['id']})
+        item = get_url_by_id(conn, id)
+        entry_checks = get_url_checks(conn, {'url_id': item['id']})
         return render_template('one_url.html',
                                entry=item,
                                entry_checks=entry_checks)
@@ -77,7 +77,7 @@ def show_one_url(id):
 def check_url(id):
     with psycopg2.connect(DATABASE_URL) as conn:
         # the url check to be added to DB
-        item = read_sql_urls_by_id(conn, id)
+        item = get_url_by_id(conn, id)
         web_address = item['name']
         if get_status(web_address) == 404:
             flash('Произошла ошибка при проверке', 'error')
@@ -85,6 +85,6 @@ def check_url(id):
             content = get_content(web_address)
             content.update({'url_id': id,
                             'status_code': get_status(web_address)})
-            add_to_sql_url_checks(conn, content)
+            add_to_url_checks(conn, content)
             flash('Страница успешно проверена', 'success')
         return redirect(url_for('show_one_url', id=id))

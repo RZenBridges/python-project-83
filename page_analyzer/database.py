@@ -4,10 +4,12 @@ from psycopg2.extras import DictCursor
 
 SELECT_URL_BY_ID = """
 SELECT * FROM urls WHERE urls.id = %(id)s
+;
 """
 
 SELECT_URL_BY_NAME = """
 SELECT * FROM urls WHERE urls.name = %(name)s
+;
 """
 
 SELECT_URLS_AND_CHECKS = """
@@ -16,15 +18,11 @@ SELECT
     urls.id,
     urls.name,
     status_code,
-    url_checks.created_at AS check_made_at
+    url_checks.created_at
 FROM urls
 LEFT JOIN
   url_checks
     ON urls.id = url_checks.url_id
-GROUP BY
-    urls.id,
-    url_checks.id,
-    status_code
 ORDER BY
     urls.id,
     url_checks.id DESC
@@ -59,45 +57,43 @@ VALUES (
 """
 
 
-def read_sql_urls_by_name(conn, name):
+def get_url_by_name(conn, name):
     with conn.cursor(cursor_factory=DictCursor) as curs:
         curs.execute(SELECT_URL_BY_NAME, {'name': name})
         found_item = curs.fetchone()
     return found_item
 
 
-def read_sql_urls_by_id(conn, id):
+def get_url_by_id(conn, id):
     with conn.cursor(cursor_factory=DictCursor) as curs:
         curs.execute(SELECT_URL_BY_ID, {'id': id})
         found_item = curs.fetchone()
     return found_item
 
 
-def read_sql_urls(conn):
+def get_urls(conn):
     with conn.cursor(cursor_factory=DictCursor) as curs:
         curs.execute(SELECT_URLS_AND_CHECKS)
         all_entries = curs.fetchall()
     return all_entries
 
 
-def add_to_sql_urls(conn, values):
+def add_to_urls(conn, values):
     with conn.cursor(cursor_factory=DictCursor) as curs:
-        values.update({'created_at': dt.datetime.now().date()})
+        values.update({'created_at': dt.datetime.now()})
         curs.execute(INSERT_URL, values)
         returned_id = curs.fetchone()['id']
-    conn.commit()
     return returned_id
 
 
-def read_sql_url_checks(conn, url_id):
+def get_url_checks(conn, url_id):
     with conn.cursor(cursor_factory=DictCursor) as curs:
         curs.execute(SELECT_URL_CHECKS, url_id)
         all_entries = curs.fetchall()
     return all_entries
 
 
-def add_to_sql_url_checks(conn, values):
+def add_to_url_checks(conn, values):
     with conn.cursor(cursor_factory=DictCursor) as curs:
-        values.update({'created_at': dt.datetime.now().date()})
+        values.update({'created_at': dt.datetime.now()})
         curs.execute(INSERT_URL_CHECKS, values)
-    conn.commit()
