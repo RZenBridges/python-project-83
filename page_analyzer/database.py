@@ -20,12 +20,12 @@ SELECT
     status_code,
     url_checks.created_at
 FROM urls
-LEFT JOIN
-  url_checks
-    ON urls.id = url_checks.url_id
+  LEFT JOIN
+    url_checks
+      ON urls.id = url_checks.url_id
 ORDER BY
     urls.id,
-    url_checks.id DESC
+    url_checks.created_at DESC
 ;
 """
 

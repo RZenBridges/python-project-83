@@ -67,8 +67,13 @@ def show_one_url(id):
     with psycopg2.connect(DATABASE_URL) as conn:
         # ID is pulled out of DB
         item = get_url_by(conn, id)
-        url_checks = get_url_checks(conn, {'url_id': item['id']})
+        try:
+            url_checks = get_url_checks(conn, {'url_id': item['id']})
+        except TypeError:
+            flash('Такой страницы не существует', 'error')
     conn.close()
+    if item is None:
+        return redirect(url_for('index'))
     return render_template('one_url.html',
                            entry=item,
                            entry_checks=url_checks)
