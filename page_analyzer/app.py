@@ -45,7 +45,7 @@ def add_url():
             id = item['id']
             flash('Страница уже существует', 'success')
             return redirect(url_for('show_one_url', id=id))
-        except KeyError:
+        except TypeError:
             returned_id = add_to_urls(conn, {'name': url_for_check})
             flash('Страница успешно добавлена', 'success')
     conn.close()
