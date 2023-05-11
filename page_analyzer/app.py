@@ -40,14 +40,14 @@ def add_url():
         return render_template('index.html', user_input=user_input), 422
 
     with psycopg2.connect(DATABASE_URL) as conn:
-        item = get_url_by_name(conn, url_for_check)
-        if item:
+        try:
+            item = get_url_by_name(conn, url_for_check)
+            id =  item['id']
             flash('Страница уже существует', 'success')
-            conn.close()
             return redirect(url_for('show_one_url', id=item['id']))
-
-        returned_id = add_to_urls(conn, {'name': url_for_check})
-        flash('Страница успешно добавлена', 'success')
+        except KeyError:
+            returned_id = add_to_urls(conn, {'name': url_for_check})
+            flash('Страница успешно добавлена', 'success')
     conn.close()
     return redirect(url_for('show_one_url', id=returned_id))
 
