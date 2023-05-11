@@ -30,13 +30,13 @@ def index():
 def add_url():
     # url from the form is processed
     user_input = request.form.get('url')
+    if user_input == '':
+        flash('URL обязателен', 'error')
     url_parts = urlparse(user_input.lower())
     url_for_check = f'{url_parts.scheme}://{url_parts.netloc}'
     # check if url has correct features
     if not validators.url(url_for_check) or len(url_for_check) > 255:
         flash('Некорректный URL', 'error')
-        if user_input == '':
-            flash('URL обязателен', 'error')
         return render_template('index.html', user_input=user_input), 422
 
     with psycopg2.connect(DATABASE_URL) as conn:
@@ -83,6 +83,7 @@ def check_url(id):
         try:
             r = requests.get(url)
             content = get_content(r)
+            r.raise_for_status()
             content.update({'url_id': id,
                             'status_code': r.status_code})
             add_to_url_checks(conn, content)
