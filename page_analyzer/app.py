@@ -44,12 +44,11 @@ def add_url():
             item = get_url_by_name(conn, url_for_check)
             id = item['id']
             flash('Страница уже существует', 'success')
-            return redirect(url_for('show_one_url', id=id))
         except TypeError:
-            returned_id = add_to_urls(conn, {'name': url_for_check})
+            id = add_to_urls(conn, {'name': url_for_check})
             flash('Страница успешно добавлена', 'success')
     conn.close()
-    return redirect(url_for('show_one_url', id=returned_id))
+    return redirect(url_for('show_one_url', id=id))
 
 
 # all urls - GET
