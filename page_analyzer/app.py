@@ -42,9 +42,9 @@ def add_url():
     with psycopg2.connect(DATABASE_URL) as conn:
         try:
             item = get_url_by_name(conn, url_for_check)
-            id =  item['id']
+            id = item['id']
             flash('Страница уже существует', 'success')
-            return redirect(url_for('show_one_url', id=item['id']))
+            return redirect(url_for('show_one_url', id=id))
         except KeyError:
             returned_id = add_to_urls(conn, {'name': url_for_check})
             flash('Страница успешно добавлена', 'success')
