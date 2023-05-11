@@ -9,7 +9,7 @@ from dotenv import load_dotenv
 import psycopg2
 
 from .database import get_urls, add_to_urls, get_url_checks,\
-    add_to_url_checks, get_url_by_id, get_url_by_name
+    add_to_url_checks, get_url_by
 from .html_parsing import get_content
 
 load_dotenv()
@@ -40,7 +40,7 @@ def add_url():
         return render_template('index.html', user_input=user_input), 422
 
     with psycopg2.connect(DATABASE_URL) as conn:
-        item = get_url_by_name(conn, url_for_check)
+        item = get_url_by(conn, url_for_check)
         if item:
             id = item['id']
             flash('Страница уже существует', 'success')
@@ -66,7 +66,7 @@ def show_urls():
 def show_one_url(id):
     with psycopg2.connect(DATABASE_URL) as conn:
         # ID is pulled out of DB
-        item = get_url_by_id(conn, id)
+        item = get_url_by(conn, id)
         url_checks = get_url_checks(conn, {'url_id': item['id']})
     conn.close()
     return render_template('one_url.html',
@@ -78,12 +78,12 @@ def show_one_url(id):
 @app.post('/urls/<int:id>/checks')
 def check_url(id):
     with psycopg2.connect(DATABASE_URL) as conn:
-        item = get_url_by_id(conn, id)
+        item = get_url_by(conn, id)
         url = item['name']
         try:
             r = requests.get(url)
-            content = get_content(r)
             r.raise_for_status()
+            content = get_content(r)
             content.update({'url_id': id,
                             'status_code': r.status_code})
             add_to_url_checks(conn, content)

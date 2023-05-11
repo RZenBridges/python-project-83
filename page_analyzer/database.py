@@ -57,16 +57,12 @@ VALUES (
 """
 
 
-def get_url_by_name(conn, name):
+def get_url_by(conn, attribute):
     with conn.cursor(cursor_factory=DictCursor) as curs:
-        curs.execute(SELECT_URL_BY_NAME, {'name': name})
-        found_item = curs.fetchone()
-    return found_item
-
-
-def get_url_by_id(conn, id):
-    with conn.cursor(cursor_factory=DictCursor) as curs:
-        curs.execute(SELECT_URL_BY_ID, {'id': id})
+        if isinstance(attribute, int):
+            curs.execute(SELECT_URL_BY_ID, {'id': attribute})
+        else:
+            curs.execute(SELECT_URL_BY_NAME, {'name': attribute})
         found_item = curs.fetchone()
     return found_item
 
