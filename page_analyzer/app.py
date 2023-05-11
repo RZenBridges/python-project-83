@@ -1,4 +1,6 @@
 import os
+import requests
+from requests.exceptions import RequestException
 
 from flask import Flask, flash, redirect, render_template, request, url_for
 import validators
@@ -8,7 +10,7 @@ import psycopg2
 
 from .database import get_urls, add_to_urls, get_url_checks,\
     add_to_url_checks, get_url_by_id, get_url_by_name
-from .http_requests import get_status, get_content
+from .html_parsing import get_content
 
 load_dotenv()
 
@@ -19,7 +21,7 @@ DATABASE_URL = os.environ.get('DATABASE_URL')
 
 # main page - GET
 @app.get('/')
-def get_first():
+def index():
     return render_template('index.html')
 
 
@@ -27,26 +29,26 @@ def get_first():
 @app.post('/urls')
 def add_url():
     # url from the form is processed
-    raw_request = request.form.get('url')
-    url = urlparse(raw_request.lower())
-    url_for_check = f'{url.scheme}://{url.netloc}'
+    user_input = request.form.get('url')
+    url_parts = urlparse(user_input.lower())
+    url_for_check = f'{url_parts.scheme}://{url_parts.netloc}'
     # check if url has a correct features
     if not validators.url(url_for_check):
         flash('Некорректный URL', 'error')
-        if raw_request == '':
+        if user_input == '':
             flash('URL обязателен', 'error')
-        return render_template('index.html', user_input=raw_request), 422
+        return render_template('index.html', user_input=user_input), 422
 
     with psycopg2.connect(DATABASE_URL) as conn:
-        # check if url is not already in DB
         item = get_url_by_name(conn, url_for_check)
         if item:
             flash('Страница уже существует', 'success')
+            conn.close()
             return redirect(url_for('show_one_url', id=item['id']))
 
-        # add the url toflash('Страница успешно проверена', 'success')
         returned_id = add_to_urls(conn, {'name': url_for_check})
         flash('Страница успешно добавлена', 'success')
+    conn.close()
     return redirect(url_for('show_one_url', id=returned_id))
 
 
@@ -56,6 +58,7 @@ def show_urls():
     with psycopg2.connect(DATABASE_URL) as conn:
         # show all the urls that were added by users
         all_entries = get_urls(conn)
+    conn.close()
     return render_template('urls.html',
                            all_entries=all_entries)
 
@@ -67,9 +70,10 @@ def show_one_url(id):
         # ID is pulled out of DB
         item = get_url_by_id(conn, id)
         entry_checks = get_url_checks(conn, {'url_id': item['id']})
-        return render_template('one_url.html',
-                               entry=item,
-                               entry_checks=entry_checks)
+    conn.close()
+    return render_template('one_url.html',
+                           entry=item,
+                           entry_checks=entry_checks)
 
 
 # check one url - POST
@@ -78,13 +82,15 @@ def check_url(id):
     with psycopg2.connect(DATABASE_URL) as conn:
         # the url check to be added to DB
         item = get_url_by_id(conn, id)
-        web_address = item['name']
-        if get_status(web_address) == 404:
-            flash('Произошла ошибка при проверке', 'error')
-        else:
-            content = get_content(web_address)
+        url = item['name']
+        try:
+            r = requests.get(url)
+            content = get_content(r)
             content.update({'url_id': id,
-                            'status_code': get_status(web_address)})
+                            'status_code': r.status_code})
             add_to_url_checks(conn, content)
             flash('Страница успешно проверена', 'success')
-        return redirect(url_for('show_one_url', id=id))
+        except RequestException:
+            flash('Произошла ошибка при проверке', 'error')
+    conn.close()
+    return redirect(url_for('show_one_url', id=id))
