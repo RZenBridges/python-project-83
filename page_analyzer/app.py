@@ -48,7 +48,7 @@ def add_url():
             id = add_to_urls(conn, {'name': url_for_check})
             flash('Страница успешно добавлена', 'success')
     conn.close()
-    return redirect(url_for('show_one_url', id=id))
+    return redirect(url_for('show_url', id=id))
 
 
 # all urls - GET
@@ -63,7 +63,7 @@ def show_urls():
 
 # one url - GET
 @app.get('/urls/<int:id>')
-def show_one_url(id):
+def show_url(id):
     with psycopg2.connect(DATABASE_URL) as conn:
         # ID is pulled out of DB
         item = get_url_by(conn, id)
@@ -75,8 +75,8 @@ def show_one_url(id):
     if item is None:
         return redirect(url_for('index'))
     return render_template('one_url.html',
-                           entry=item,
-                           entry_checks=url_checks)
+                           url=item,
+                           url_checks=url_checks)
 
 
 # check one url - POST
@@ -96,4 +96,4 @@ def check_url(id):
         except RequestException:
             flash('Произошла ошибка при проверке', 'error')
     conn.close()
-    return redirect(url_for('show_one_url', id=id))
+    return redirect(url_for('show_url', id=id))
