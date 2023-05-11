@@ -56,11 +56,10 @@ def add_url():
 @app.get('/urls')
 def show_urls():
     with psycopg2.connect(DATABASE_URL) as conn:
-        # show all the urls that were added by users
-        all_entries = get_urls(conn)
+        all_urls = get_urls(conn)
     conn.close()
     return render_template('urls.html',
-                           all_entries=all_entries)
+                           all_entries=all_urls)
 
 
 # one url - GET
@@ -69,18 +68,17 @@ def show_one_url(id):
     with psycopg2.connect(DATABASE_URL) as conn:
         # ID is pulled out of DB
         item = get_url_by_id(conn, id)
-        entry_checks = get_url_checks(conn, {'url_id': item['id']})
+        url_checks = get_url_checks(conn, {'url_id': item['id']})
     conn.close()
     return render_template('one_url.html',
                            entry=item,
-                           entry_checks=entry_checks)
+                           entry_checks=url_checks)
 
 
 # check one url - POST
 @app.post('/urls/<int:id>/checks')
 def check_url(id):
     with psycopg2.connect(DATABASE_URL) as conn:
-        # the url check to be added to DB
         item = get_url_by_id(conn, id)
         url = item['name']
         try:
