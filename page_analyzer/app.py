@@ -32,19 +32,19 @@ def add_url():
     user_input = request.form.get('url')
     url_parts = urlparse(user_input.lower())
     url_for_check = f'{url_parts.scheme}://{url_parts.netloc}'
-    # check if url has a correct features
-    if not validators.url(url_for_check):
+    # check if url has correct features
+    if not validators.url(url_for_check) or len(url_for_check) > 255:
         flash('Некорректный URL', 'error')
         if user_input == '':
             flash('URL обязателен', 'error')
         return render_template('index.html', user_input=user_input), 422
 
     with psycopg2.connect(DATABASE_URL) as conn:
-        try:
-            item = get_url_by_name(conn, url_for_check)
+        item = get_url_by_name(conn, url_for_check)
+        if item:
             id = item['id']
             flash('Страница уже существует', 'success')
-        except TypeError:
+        else:
             id = add_to_urls(conn, {'name': url_for_check})
             flash('Страница успешно добавлена', 'success')
     conn.close()
