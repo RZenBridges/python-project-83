@@ -89,10 +89,13 @@ def check_url(id):
             try:
                 response = requests.get(url)
                 response.raise_for_status()
-                content = get_seo_content(response.text)
-                content.update({'url_id': id,
-                                'status_code': response.status_code})
-                add_to_url_checks(conn, content)
+                h1, title, description = get_seo_content(response.text)
+                add_to_url_checks(conn,
+                                  url_id=id,
+                                  status_code=response.status_code,
+                                  h1=h1,
+                                  title=title,
+                                  description=description)
                 flash('Страница успешно проверена', 'success')
             except RequestException:
                 flash('Произошла ошибка при проверке', 'error')

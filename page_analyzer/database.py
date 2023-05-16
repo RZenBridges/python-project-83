@@ -54,6 +54,9 @@ def get_url_by(conn, **kwargs):
     return found_item
 
 
+# сохранил DictCursor поскольку кажется, что в таком виде в html
+# элементы раскрываются явно через имена id, title и тд
+# разве так не лучше?
 def get_urls(conn):
     with conn.cursor(cursor_factory=DictCursor) as curs:
         curs.execute(SELECT_URLS_AND_CHECKS)
@@ -68,6 +71,9 @@ def add_to_urls(conn, url):
     return returned_id
 
 
+# сохранил DictCursor поскольку кажется, что в таком виде в html
+# элементы раскрываются явно через имена id, title и тд
+# разве так не лучше?
 def get_url_checks(conn, url_id):
     with conn.cursor(cursor_factory=DictCursor) as curs:
         curs.execute(SELECT_URL_CHECKS, url_id)
@@ -75,7 +81,7 @@ def get_url_checks(conn, url_id):
     return all_entries
 
 
-def add_to_url_checks(conn, values):
+def add_to_url_checks(conn, **kwargs):
     with conn.cursor(cursor_factory=DictCursor) as curs:
-        values.update({'created_at': dt.datetime.now()})
-        curs.execute(INSERT_URL_CHECKS, values)
+        curs.execute(INSERT_URL_CHECKS,
+                     kwargs | {'created_at': dt.datetime.now()})
