@@ -7,7 +7,7 @@ import psycopg2
 
 from .database import get_urls, add_to_urls, get_url_checks,\
     add_to_url_checks, get_url_by
-from .html_parsing import get_content
+from .html import get_seo_content
 from .validation import normalize, validate
 
 load_dotenv()
@@ -37,7 +37,7 @@ def add_url():
 
     try:
         with psycopg2.connect(DATABASE_URL) as conn:
-            item = get_url_by(conn, valid_url)
+            item = get_url_by(conn, name=valid_url)
             if item:
                 id = item['id']
                 flash('Страница уже существует', 'success')
@@ -66,7 +66,7 @@ def show_url(id):
     try:
         with psycopg2.connect(DATABASE_URL) as conn:
             # ID is pulled out of DB
-            item = get_url_by(conn, id)
+            item = get_url_by(conn, id=id)
             if item:
                 url_checks = get_url_checks(conn, {'url_id': item['id']})
             else:
@@ -84,12 +84,12 @@ def show_url(id):
 def check_url(id):
     try:
         with psycopg2.connect(DATABASE_URL) as conn:
-            item = get_url_by(conn, id)
+            item = get_url_by(conn, id=id)
             url = item['name']
             try:
                 response = requests.get(url)
                 response.raise_for_status()
-                content = get_content(response)
+                content = get_seo_content(response.text)
                 content.update({'url_id': id,
                                 'status_code': response.status_code})
                 add_to_url_checks(conn, content)

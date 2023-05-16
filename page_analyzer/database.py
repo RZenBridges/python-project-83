@@ -2,16 +2,6 @@ import datetime as dt
 
 from psycopg2.extras import DictCursor
 
-SELECT_URL_BY_ID = """
-SELECT * FROM urls WHERE urls.id = %(id)s
-;
-"""
-
-SELECT_URL_BY_NAME = """
-SELECT * FROM urls WHERE urls.name = %(name)s
-;
-"""
-
 SELECT_URLS_AND_CHECKS = """
 SELECT
   DISTINCT ON (urls.id)
@@ -25,15 +15,13 @@ FROM urls
       ON urls.id = url_checks.url_id
 ORDER BY
     urls.id,
-    url_checks.created_at DESC
-;
+    url_checks.created_at DESC;
 """
 
 INSERT_URL = """
 INSERT INTO urls (name, created_at)
 VALUES (%(name)s, %(created_at)s)
-RETURNING id
-;
+RETURNING id;
 """
 
 SELECT_URL_CHECKS = "SELECT * FROM url_checks WHERE url_id = (%(url_id)s);"
@@ -57,12 +45,11 @@ VALUES (
 """
 
 
-def get_url_by(conn, attribute):
+def get_url_by(conn, **kwargs):
     with conn.cursor(cursor_factory=DictCursor) as curs:
-        if isinstance(attribute, int):
-            curs.execute(SELECT_URL_BY_ID, {'id': attribute})
-        else:
-            curs.execute(SELECT_URL_BY_NAME, {'name': attribute})
+        key = list(kwargs.keys())[0]
+        curs.execute(f"SELECT * FROM urls WHERE urls.{key} = %({key})s;",
+                     kwargs)
         found_item = curs.fetchone()
     return found_item
 
