@@ -85,7 +85,10 @@ def check_url(id):
     try:
         with psycopg2.connect(DATABASE_URL) as conn:
             item = get_url_by(conn, id=id)
-            url = item['name']
+            if item:
+                url = item['name']
+            else:
+                return '', 404
             try:
                 response = requests.get(url)
                 response.raise_for_status()
