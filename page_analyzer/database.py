@@ -20,7 +20,7 @@ ORDER BY
 
 INSERT_URL = """
 INSERT INTO urls (name, created_at)
-VALUES (%(name)s, %(created_at)s)
+VALUES (%s, %s)
 RETURNING id;
 """
 
@@ -61,11 +61,10 @@ def get_urls(conn):
     return all_entries
 
 
-def add_to_urls(conn, values):
-    with conn.cursor(cursor_factory=DictCursor) as curs:
-        values.update({'created_at': dt.datetime.now()})
-        curs.execute(INSERT_URL, values)
-        returned_id = curs.fetchone()['id']
+def add_to_urls(conn, url):
+    with conn.cursor() as curs:
+        curs.execute(INSERT_URL, (url, dt.datetime.now()))
+        returned_id, = curs.fetchone()
     return returned_id
 
 

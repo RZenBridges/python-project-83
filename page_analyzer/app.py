@@ -42,7 +42,7 @@ def add_url():
                 id = item['id']
                 flash('Страница уже существует', 'success')
             else:
-                id = add_to_urls(conn, {'name': valid_url})
+                id = add_to_urls(conn, valid_url)
                 flash('Страница успешно добавлена', 'success')
     finally:
         conn.close()
@@ -63,14 +63,14 @@ def show_urls():
 # one url - GET
 @app.get('/urls/<int:id>')
 def show_url(id):
+    conn = psycopg2.connect(DATABASE_URL)
+    # ID is pulled out of DB
     try:
-        with psycopg2.connect(DATABASE_URL) as conn:
-            # ID is pulled out of DB
-            item = get_url_by(conn, id=id)
-            if item:
-                url_checks = get_url_checks(conn, {'url_id': item['id']})
-            else:
-                flash('Такой страницы не существует', 'error')
+        item = get_url_by(conn, id=id)
+        if item:
+            url_checks = get_url_checks(conn, {'url_id': item['id']})
+        else:
+            flash('Такой страницы не существует', 'error')
     finally:
         conn.close()
 
