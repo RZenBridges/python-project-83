@@ -45,17 +45,24 @@ VALUES (
 """
 
 
-def get_url_by(conn, **kwargs):
+def get_url_by_name(conn, name):
     with conn.cursor(cursor_factory=DictCursor) as curs:
-        key = list(kwargs.keys())[0]
-        curs.execute(f"SELECT * FROM urls WHERE urls.{key} = %({key})s;",
-                     kwargs)
+        curs.execute('SELECT * FROM urls WHERE urls.name = %(name)s;',
+                     {'name': name})
+        found_item = curs.fetchone()
+    return found_item
+
+
+def get_url_by_id(conn, id):
+    with conn.cursor(cursor_factory=DictCursor) as curs:
+        curs.execute('SELECT * FROM urls WHERE urls.id = %(id)s;',
+                     {'id': id})
         found_item = curs.fetchone()
     return found_item
 
 
 # сохранил DictCursor поскольку кажется, что в таком виде в html
-# элементы раскрываются явно через имена id, title и тд
+# элементы раскрываются явно через ключи id, title и тд
 # разве так не лучше?
 def get_urls(conn):
     with conn.cursor(cursor_factory=DictCursor) as curs:
@@ -72,7 +79,7 @@ def add_to_urls(conn, url):
 
 
 # сохранил DictCursor поскольку кажется, что в таком виде в html
-# элементы раскрываются явно через имена id, title и тд
+# элементы раскрываются явно через ключи id, title и тд
 # разве так не лучше?
 def get_url_checks(conn, url_id):
     with conn.cursor(cursor_factory=DictCursor) as curs:
