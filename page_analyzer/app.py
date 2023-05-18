@@ -8,13 +8,18 @@ import psycopg2
 from .database import get_urls, add_to_urls, get_url_checks,\
     add_to_url_checks, get_url_by_name, get_url_by_id
 from .html import get_seo_content
-from .validation import normalize, validate
+from .url import normalize, validate
 
 load_dotenv()
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = os.environ.get('SECRET', 'secret_key')
 DATABASE_URL = os.environ.get('DATABASE_URL')
+
+
+@app.errorhandler(404)
+def not_found(error):
+    return '<h1>Страница не существует</h1>', 404
 
 
 # main page - GET
@@ -71,11 +76,10 @@ def show_url(id):
             url_checks = get_url_checks(conn, {'url_id': item['id']})
         else:
             flash('Такой страницы не существует', 'error')
+            return redirect(url_for('index'))
     finally:
         conn.close()
 
-    if item is None:
-        return redirect(url_for('index'))
     return render_template('one_url.html', url=item, url_checks=url_checks)
 
 
