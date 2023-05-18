@@ -1,5 +1,7 @@
 import datetime as dt
+import contextlib
 
+import psycopg2
 from psycopg2.extras import DictCursor
 
 SELECT_URLS_AND_CHECKS = """
@@ -43,6 +45,16 @@ VALUES (
     %(created_at)s
 );
 """
+
+
+@contextlib.contextmanager
+def connection(db_uri):
+    conn = psycopg2.connect(db_uri)
+    try:
+        yield conn
+    finally:
+        conn.commit()
+        conn.close()
 
 
 def get_url_by_name(conn, name):
