@@ -1,4 +1,5 @@
 import os
+import logging
 import requests
 from requests.exceptions import RequestException
 from flask import Flask, flash, redirect, render_template, request, url_for
@@ -79,7 +80,6 @@ def show_url(id):
             return redirect(url_for('index'))
     finally:
         conn.close()
-
     return render_template('one_url.html', url=item, url_checks=url_checks)
 
 
@@ -105,6 +105,7 @@ def check_url(id):
                                   description=description)
                 flash('Страница успешно проверена', 'success')
             except RequestException:
+                logging.error("This URL doesn't exist")
                 flash('Произошла ошибка при проверке', 'error')
     finally:
         conn.close()
