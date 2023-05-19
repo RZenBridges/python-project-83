@@ -33,21 +33,21 @@ def index():
 @app.post('/urls')
 def add_url():
     # check if the url from the form is correct
-    queried_url = request.form.get('url')
-    is_normal, normal_url = normalize(queried_url)
-    is_valid, valid_url = validate(normal_url)
-    if not all([is_normal, is_valid]):
-        for status, message in ((is_normal, normal_url), (is_valid, valid_url)):
-            flash(message, 'error') if status is False else None
-        return render_template('index.html', user_input=queried_url), 422
+    url = request.form.get('url')
+    normal_url = normalize(url)
+    feedback = validate(normal_url)
+    if feedback:
+        for message in feedback:
+            flash(message, 'error')
+        return render_template('index.html', user_input=url), 422
 
     with connection(DATABASE_URL) as conn:
-        item = get_url_by_name(conn, valid_url)
-        if item:
-            id = item['id']
+        found_url = get_url_by_name(conn, normal_url)
+        if found_url:
+            id = found_url['id']
             flash('Страница уже существует', 'success')
         else:
-            id = add_to_urls(conn, valid_url)
+            id = add_to_urls(conn, normal_url)
             flash('Страница успешно добавлена', 'success')
     return redirect(url_for('show_url', id=id))
 
@@ -65,26 +65,26 @@ def show_urls():
 def show_url(id):
     with connection(DATABASE_URL) as conn:
         # ID is pulled out of DB
-        item = get_url_by_id(conn, id)
-        if item:
-            url_checks = get_url_checks(conn, {'url_id': item['id']})
+        found_url = get_url_by_id(conn, id)
+        if found_url:
+            url_checks = get_url_checks(conn, {'url_id': found_url['id']})
         else:
             flash('Такой страницы не существует', 'error')
             return redirect(url_for('index'))
-    return render_template('one_url.html', url=item, url_checks=url_checks)
+    return render_template('one_url.html', url=found_url, url_checks=url_checks)
 
 
 # check one url - POST
 @app.post('/urls/<int:id>/checks')
 def check_url(id):
     with connection(DATABASE_URL) as conn:
-        item = get_url_by_id(conn, id)
-        if item:
-            url = item['name']
+        found_url = get_url_by_id(conn, id)
+        if found_url:
+            url_name = found_url['name']
         else:
-            return '', 404
+            return 'Страница не существует', 404
         try:
-            response = requests.get(url)
+            response = requests.get(url_name)
             response.raise_for_status()
             h1, title, description = get_seo_content(response.text)
             add_to_url_checks(conn,
