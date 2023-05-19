@@ -73,9 +73,6 @@ def get_url_by_id(conn, id):
     return found_item
 
 
-# сохранил DictCursor поскольку кажется, что в таком виде в html
-# элементы раскрываются явно через ключи id, title и тд
-# разве так не лучше?
 def get_urls(conn):
     with conn.cursor(cursor_factory=DictCursor) as curs:
         curs.execute(SELECT_URLS_AND_CHECKS)
@@ -90,9 +87,6 @@ def add_to_urls(conn, url):
     return returned_id
 
 
-# сохранил DictCursor поскольку кажется, что в таком виде в html
-# элементы раскрываются явно через ключи id, title и тд
-# разве так не лучше?
 def get_url_checks(conn, url_id):
     with conn.cursor(cursor_factory=DictCursor) as curs:
         curs.execute(SELECT_URL_CHECKS, url_id)
