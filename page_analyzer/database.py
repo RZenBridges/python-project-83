@@ -4,6 +4,9 @@ import contextlib
 import psycopg2
 from psycopg2.extras import DictCursor
 
+
+SELECT_URL = 'SELECT * FROM urls WHERE urls.{column} = %({column})s;'
+
 SELECT_URLS_AND_CHECKS = """
 SELECT
   DISTINCT ON (urls.id)
@@ -48,18 +51,21 @@ VALUES (
 
 
 @contextlib.contextmanager
-def connection(db_uri):
-    conn = psycopg2.connect(db_uri)
+def connection(db_url):
+    conn = psycopg2.connect(db_url)
     try:
         yield conn
-    finally:
+    except Exception:
+        conn.rollback()
+    else:
         conn.commit()
+    finally:
         conn.close()
 
 
 def get_url_by_name(conn, name):
     with conn.cursor(cursor_factory=DictCursor) as curs:
-        curs.execute('SELECT * FROM urls WHERE urls.name = %(name)s;',
+        curs.execute(SELECT_URL.format(column='name'),
                      {'name': name})
         found_item = curs.fetchone()
     return found_item
@@ -67,7 +73,7 @@ def get_url_by_name(conn, name):
 
 def get_url_by_id(conn, id):
     with conn.cursor(cursor_factory=DictCursor) as curs:
-        curs.execute('SELECT * FROM urls WHERE urls.id = %(id)s;',
+        curs.execute(SELECT_URL.format(column='id'),
                      {'id': id})
         found_item = curs.fetchone()
     return found_item

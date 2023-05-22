@@ -2,14 +2,12 @@ import validators
 from urllib.parse import urlparse
 
 
-def normalize(inserted_url):
-    lower_url = inserted_url.lower()
-    url_parts = urlparse(lower_url)
+def normalize(url):
+    url_parts = urlparse(url.lower())
     if url_parts.scheme and url_parts.netloc:
-        url_for_check = f'{url_parts.scheme}://{url_parts.netloc}'
+        return f'{url_parts.scheme}://{url_parts.netloc}'
     else:
-        url_for_check = lower_url
-    return url_for_check
+        return url
 
 
 def validate(url_for_check):
