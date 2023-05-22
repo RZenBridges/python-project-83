@@ -40,10 +40,9 @@ def add_url():
     # check if the url from the form is correct
     url = request.form.get('url')
     normalized_url = normalize(url)
-    feedback = validate(normalized_url)
-    if feedback:
-        for message in feedback:
-            flash(message, 'error')
+    message = validate(normalized_url)
+    if message:
+        flash(message, 'error')
         return render_template('index.html', user_input=url), 422
 
     with connection(DATABASE_URL) as conn:

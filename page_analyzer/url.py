@@ -13,11 +13,9 @@ def normalize(inserted_url):
 
 
 def validate(url_for_check):
-    alert = []
     if url_for_check == '':
-        alert.append('URL обязателен')
+        return 'URL обязателен'
     if len(url_for_check) > 255:
-        alert.append('URL не может превышать 255 символов')
+        return 'URL не может превышать 255 символов'
     if not validators.url(url_for_check):
-        alert.append('Некорректный URL')
-    return alert
+        return 'Некорректный URL'
