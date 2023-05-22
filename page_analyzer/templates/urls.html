@@ -17,12 +17,12 @@
             </tr>
           </thead>
           <tbody>
-            {% for item in all_entries %}
+            {% for url in all_urls %}
             <tr>
-              <td>{{ item.id }}</td>
-              <td><a href=" {{ url_for('show_url', id=item.id) }} ">{{ item.name }}</a></td>
-              <td>{{ item.created_at.date() if item.created_at }}</td>
-              <td>{{ item.status_code|default('', true) }}</td>
+              <td>{{ url.id }}</td>
+              <td><a href=" {{ url_for('show_url', id=url.id) }} ">{{ url.name }}</a></td>
+              <td>{{ url.created_at.date() if url.created_at }}</td>
+              <td>{{ url.status_code|default('', true) }}</td>
             </tr>
             {% endfor %}
           </tbody>

@@ -61,7 +61,7 @@ def add_url():
 def show_urls():
     with connection(DATABASE_URL) as conn:
         all_urls = get_urls(conn)
-    return render_template('urls.html', all_entries=all_urls)
+    return render_template('urls.html', all_urls=all_urls)
 
 
 # one url - GET
