@@ -20,12 +20,7 @@ DATABASE_URL = os.environ.get('DATABASE_URL')
 
 @app.errorhandler(404)
 def not_found(error):
-    return '<h1>Страница не существует 404</h1>', 404
-
-
-@app.errorhandler(500)
-def server_error(error):
-    return '<h1>Страница не существует 500</h1>', 404
+    return '<h1>Страница не существует</h1>', 404
 
 
 # main page - GET
@@ -82,11 +77,14 @@ def show_url(id):
 def check_url(id):
     with connection(DATABASE_URL) as conn:
         found_url = get_url_by_id(conn, id)
+        if not found_url:
+            logging.warning(f"POST запрос с параметром '{id}' невозможен")
+            return redirect(url_for('not_found'))
         try:
             response = requests.get(found_url['name'])
             response.raise_for_status()
-        except (RequestException, TypeError):
-            logging.error(f"No url is registered under the id {id}")
+        except RequestException:
+            logging.error(f"Невозможно проверить {found_url['name']}")
             flash('Произошла ошибка при проверке', 'error')
         else:
             h1, title, description = get_seo_content(response.text)
