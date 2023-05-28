@@ -57,6 +57,7 @@ def connection(db_url):
         yield conn
     except Exception:
         conn.rollback()
+        raise
     else:
         conn.commit()
     finally:

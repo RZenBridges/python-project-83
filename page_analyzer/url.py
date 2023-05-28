@@ -6,8 +6,7 @@ def normalize(url):
     url_parts = urlparse(url.lower())
     if url_parts.scheme and url_parts.netloc:
         return f'{url_parts.scheme}://{url_parts.netloc}'
-    else:
-        return url
+    return url
 
 
 def validate(url_for_check):

@@ -3,7 +3,8 @@ import logging
 import requests
 from requests.exceptions import RequestException
 
-from flask import Flask, flash, redirect, render_template, request, url_for
+from flask import Flask, flash, redirect,\
+    render_template, request, url_for, abort
 from dotenv import load_dotenv
 
 from .database import get_urls, add_to_urls, get_url_checks,\
@@ -20,7 +21,12 @@ DATABASE_URL = os.environ.get('DATABASE_URL')
 
 @app.errorhandler(404)
 def not_found(error):
-    return '<h1>Страница не существует</h1>', 404
+    return render_template('not_found.html'), 404
+
+
+@app.errorhandler(500)
+def cannot_return(error):
+    return render_template('not_found.html'), 500
 
 
 # main page - GET
@@ -35,9 +41,9 @@ def add_url():
     # check if the url from the form is correct
     url = request.form.get('url')
     normalized_url = normalize(url)
-    warning = validate(normalized_url)
-    if warning:
-        flash(warning, 'error')
+    error = validate(normalized_url)
+    if error:
+        flash(error, 'error')
         return render_template('index.html', user_input=url), 422
 
     with connection(DATABASE_URL) as conn:
@@ -66,9 +72,10 @@ def show_url(id):
         # ID is pulled out of DB
         found_url = get_url_by_id(conn, id)
         if not found_url:
-            flash('Такой страницы не существует', 'error')
-            return redirect(url_for('index'))
+            abort(404)
         url_checks = get_url_checks(conn, {'url_id': found_url['id']})
+#    if not found_url:
+#        abort(404)
     return render_template('one_url.html', url=found_url, url_checks=url_checks)
 
 
@@ -78,13 +85,13 @@ def check_url(id):
     with connection(DATABASE_URL) as conn:
         found_url = get_url_by_id(conn, id)
         if not found_url:
-            logging.warning(f"POST запрос с параметром '{id}' невозможен")
-            return redirect(url_for('not_found'))
+            logging.warning(f"Cannot execute POST request argument '{id}'")
+            abort(500)
         try:
             response = requests.get(found_url['name'])
             response.raise_for_status()
-        except RequestException:
-            logging.error(f"Невозможно проверить {found_url['name']}")
+        except RequestException as error:
+            logging.error(f"Impossible to check {found_url['name']}\n{error}")
             flash('Произошла ошибка при проверке', 'error')
         else:
             h1, title, description = get_seo_content(response.text)
