@@ -73,9 +73,7 @@ def show_url(id):
         found_url = get_url_by_id(conn, id)
         if not found_url:
             abort(404)
-        url_checks = get_url_checks(conn, {'url_id': found_url['id']})
-#    if not found_url:
-#        abort(404)
+        url_checks = get_url_checks(conn, id)
     return render_template('one_url.html', url=found_url, url_checks=url_checks)
 
 

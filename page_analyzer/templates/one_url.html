@@ -42,14 +42,14 @@
             </tr>
           </thead>
           <tbody>
-            {% for check in url_checks %}
+            {% for check_id, id, status_code, h1, title, description, created_at in url_checks %}
             <tr>
-              <td>{{ check.id }}</td>
-              <td>{{ check.status_code|default('', true) }}</td>
-              <td>{{ check.h1|default('', true) }}</td>
-              <td>{{ check.title|default('', true) }}</td>
-              <td>{{ check.description|default('', true) }}</td>
-              <td>{{ check.created_at.date() }}</td>
+              <td>{{ check_id }}</td>
+              <td>{{ status_code|default('', true) }}</td>
+              <td>{{ h1|default('', true) }}</td>
+              <td>{{ title|default('', true) }}</td>
+              <td>{{ description|default('', true) }}</td>
+              <td>{{ created_at.date() }}</td>
             </tr>
             {% endfor %}
           </tbody>

@@ -12,8 +12,8 @@ SELECT
   DISTINCT ON (urls.id)
     urls.id,
     urls.name,
-    status_code,
-    url_checks.created_at
+    url_checks.created_at,
+    status_code
 FROM urls
   LEFT JOIN
     url_checks
@@ -29,7 +29,7 @@ VALUES (%s, %s)
 RETURNING id;
 """
 
-SELECT_URL_CHECKS = "SELECT * FROM url_checks WHERE url_id = (%(url_id)s);"
+SELECT_URL_CHECKS = "SELECT * FROM url_checks WHERE url_id = (%s);"
 INSERT_URL_CHECKS = """
 INSERT INTO url_checks (
     url_id,
@@ -81,7 +81,7 @@ def get_url_by_id(conn, id):
 
 
 def get_urls(conn):
-    with conn.cursor(cursor_factory=DictCursor) as curs:
+    with conn.cursor() as curs:
         curs.execute(SELECT_URLS_AND_CHECKS)
         all_entries = curs.fetchall()
     return all_entries
@@ -95,8 +95,8 @@ def add_to_urls(conn, url):
 
 
 def get_url_checks(conn, url_id):
-    with conn.cursor(cursor_factory=DictCursor) as curs:
-        curs.execute(SELECT_URL_CHECKS, url_id)
+    with conn.cursor() as curs:
+        curs.execute(SELECT_URL_CHECKS, (url_id, ))
         all_entries = curs.fetchall()
     return all_entries
 

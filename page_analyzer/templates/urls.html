@@ -17,12 +17,12 @@
             </tr>
           </thead>
           <tbody>
-            {% for url in all_urls %}
+            {% for id, name, last_check, status_code in all_urls %}
             <tr>
-              <td>{{ url.id }}</td>
-              <td><a href=" {{ url_for('show_url', id=url.id) }} ">{{ url.name }}</a></td>
-              <td>{{ url.created_at.date() if url.created_at }}</td>
-              <td>{{ url.status_code|default('', true) }}</td>
+              <td>{{ id }}</td>
+              <td><a href=" {{ url_for('show_url', id=id) }} ">{{ name }}</a></td>
+              <td>{{ last_check.date() if last_check }}</td>
+              <td>{{ status_code|default('', true) }}</td>
             </tr>
             {% endfor %}
           </tbody>
