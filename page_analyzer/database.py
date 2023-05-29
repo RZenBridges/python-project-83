@@ -1,5 +1,6 @@
 import datetime as dt
 import contextlib
+from functools import partial
 
 import psycopg2
 from psycopg2.extras import DictCursor
@@ -68,18 +69,15 @@ def connection(db_url):
         conn.close()
 
 
-def get_url_by_name(conn, name):
+def get_url_by_(conn, value, name):
     with conn.cursor() as curs:
-        curs.execute(SELECT_URL.format(column='name'), (name, ))
+        curs.execute(SELECT_URL.format(column=name), (value, ))
         found_item = curs.fetchone()
     return found_item
 
 
-def get_url_by_id(conn, id):
-    with conn.cursor() as curs:
-        curs.execute(SELECT_URL.format(column='id'), (id, ))
-        found_item = curs.fetchone()
-    return found_item
+get_url_by_name = partial(get_url_by_, name='name')
+get_url_by_id = partial(get_url_by_, name='id')
 
 
 def get_urls(conn):
