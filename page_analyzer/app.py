@@ -92,7 +92,7 @@ def check_url(id):
             response = requests.get(name)
             response.raise_for_status()
         except RequestException as error:
-            logging.error(f"Impossible to check {found_url['name']}\n{error}")
+            logging.error(f"Impossible to check {name}\n{error}")
             flash('Произошла ошибка при проверке', 'error')
         else:
             h1, title, description = get_seo_content(response.text)
