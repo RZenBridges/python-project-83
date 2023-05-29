@@ -49,7 +49,7 @@ def add_url():
     with connection(DATABASE_URL) as conn:
         found_url = get_url_by_name(conn, normalized_url)
         if found_url:
-            id = found_url['id']
+            id, name, created = found_url
             flash('Страница уже существует', 'success')
         else:
             id = add_to_urls(conn, normalized_url)
@@ -73,8 +73,10 @@ def show_url(id):
         found_url = get_url_by_id(conn, id)
         if not found_url:
             abort(404)
+        id, name, created_at = found_url
         url_checks = get_url_checks(conn, id)
-    return render_template('one_url.html', url=found_url, url_checks=url_checks)
+    return render_template('one_url.html', id=id, name=name,
+                           created_at=created_at, url_checks=url_checks)
 
 
 # check one url - POST
@@ -85,8 +87,9 @@ def check_url(id):
         if not found_url:
             logging.warning(f"Cannot execute POST request argument '{id}'")
             abort(500)
+        id, name, created_at = found_url
         try:
-            response = requests.get(found_url['name'])
+            response = requests.get(name)
             response.raise_for_status()
         except RequestException as error:
             logging.error(f"Impossible to check {found_url['name']}\n{error}")

@@ -5,7 +5,7 @@ import psycopg2
 from psycopg2.extras import DictCursor
 
 
-SELECT_URL = 'SELECT * FROM urls WHERE urls.{column} = %({column})s;'
+SELECT_URL = 'SELECT * FROM urls WHERE urls.{column} = %s;'
 
 SELECT_URLS_AND_CHECKS = """
 SELECT
@@ -29,7 +29,11 @@ VALUES (%s, %s)
 RETURNING id;
 """
 
-SELECT_URL_CHECKS = "SELECT * FROM url_checks WHERE url_id = (%s);"
+SELECT_URL_CHECKS = """
+SELECT id, status_code, h1, title, description, created_at
+FROM url_checks
+  WHERE url_id = (%s);
+"""
 INSERT_URL_CHECKS = """
 INSERT INTO url_checks (
     url_id,
@@ -65,17 +69,15 @@ def connection(db_url):
 
 
 def get_url_by_name(conn, name):
-    with conn.cursor(cursor_factory=DictCursor) as curs:
-        curs.execute(SELECT_URL.format(column='name'),
-                     {'name': name})
+    with conn.cursor() as curs:
+        curs.execute(SELECT_URL.format(column='name'), (name, ))
         found_item = curs.fetchone()
     return found_item
 
 
 def get_url_by_id(conn, id):
-    with conn.cursor(cursor_factory=DictCursor) as curs:
-        curs.execute(SELECT_URL.format(column='id'),
-                     {'id': id})
+    with conn.cursor() as curs:
+        curs.execute(SELECT_URL.format(column='id'), (id, ))
         found_item = curs.fetchone()
     return found_item
 
