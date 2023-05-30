@@ -69,15 +69,15 @@ def connection(db_url):
         conn.close()
 
 
-def get_url_by_attr(conn, value, attr):
+def get_url_by(conn, value, field):
     with conn.cursor() as curs:
-        curs.execute(SELECT_URL.format(column=attr), (value, ))
+        curs.execute(SELECT_URL.format(column=field), (value, ))
         found_item = curs.fetchone()
     return found_item
 
 
-get_url_by_name = partial(get_url_by_attr, attr='name')
-get_url_by_id = partial(get_url_by_attr, attr='id')
+get_url_by_name = partial(get_url_by, field='name')
+get_url_by_id = partial(get_url_by, field='id')
 
 
 def get_urls(conn):
