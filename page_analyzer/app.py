@@ -49,7 +49,7 @@ def add_url():
     with connection(DATABASE_URL) as conn:
         found_url = get_url_by_name(conn, normalized_url)
         if found_url:
-            id, *_ = found_url
+            id = found_url.id
             flash('Страница уже существует', 'success')
         else:
             id = add_to_urls(conn, normalized_url)
@@ -73,10 +73,10 @@ def show_url(id):
         found_url = get_url_by_id(conn, id)
         if not found_url:
             abort(404)
-        id, name, created_at = found_url
         url_checks = get_url_checks(conn, id)
-    return render_template('one_url.html', id=id, name=name,
-                           created_at=created_at, url_checks=url_checks)
+    return render_template('one_url.html', id=found_url.id,
+                           name=found_url.name, created_at=found_url.created_at,
+                           url_checks=url_checks)
 
 
 # check one url - POST
@@ -86,17 +86,16 @@ def check_url(id):
         found_url = get_url_by_id(conn, id)
         if not found_url:
             abort(500)
-        id, name, _ = found_url
         try:
-            response = requests.get(name)
+            response = requests.get(found_url.name)
             response.raise_for_status()
         except RequestException as error:
-            logging.error(f"Impossible to check {name}\n{error}")
+            logging.error(f"Impossible to check {found_url.name}\n{error}")
             flash('Произошла ошибка при проверке', 'error')
         else:
             h1, title, description = get_seo_content(response.text)
             add_to_url_checks(conn,
-                              url_id=id,
+                              url_id=found_url.id,
                               status_code=response.status_code,
                               h1=h1,
                               title=title,

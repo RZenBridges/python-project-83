@@ -3,7 +3,7 @@ import contextlib
 from functools import partial
 
 import psycopg2
-from psycopg2.extras import DictCursor
+from psycopg2.extras import NamedTupleCursor
 
 
 SELECT_URL = 'SELECT * FROM urls WHERE urls.{column} = %s;'
@@ -70,7 +70,7 @@ def connection(db_url):
 
 
 def get_url_by(conn, value, field):
-    with conn.cursor() as curs:
+    with conn.cursor(cursor_factory=NamedTupleCursor) as curs:
         curs.execute(SELECT_URL.format(column=field), (value, ))
         found_item = curs.fetchone()
     return found_item
@@ -102,6 +102,6 @@ def get_url_checks(conn, url_id):
 
 
 def add_to_url_checks(conn, **kwargs):
-    with conn.cursor(cursor_factory=DictCursor) as curs:
+    with conn.cursor(cursor_factory=NamedTupleCursor) as curs:
         curs.execute(INSERT_URL_CHECKS,
                      kwargs | {'created_at': dt.datetime.now()})
