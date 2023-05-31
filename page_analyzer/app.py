@@ -24,11 +24,6 @@ def not_found(error):
     return render_template('not_found.html'), 404
 
 
-@app.errorhandler(500)
-def cannot_return(error):
-    return render_template('not_found.html'), 500
-
-
 # main page - GET
 @app.get('/')
 def index():
@@ -44,7 +39,7 @@ def add_url():
     error = validate(normalized_url)
     if error:
         flash(error, 'error')
-        return render_template('index.html', user_input=url), 422
+        return render_template('index.html', user_input=url), 400
 
     with connection(DATABASE_URL) as conn:
         found_url = get_url_by_name(conn, normalized_url)
@@ -86,7 +81,7 @@ def check_url(id):
         found_url = get_url_by_id(conn, id)
         if not found_url:
             logging.warning(f"Cannot execute POST request argument '{id}'")
-            abort(500)
+            abort(404)
         id, name, created_at = found_url
         try:
             response = requests.get(name)
