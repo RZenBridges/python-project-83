@@ -25,7 +25,7 @@ def not_found(error):
 
 
 @app.errorhandler(500)
-def not_found(error):
+def server_error(error):
     return render_template('server_error.html'), 500
 
 
