@@ -39,7 +39,7 @@ def add_url():
     error = validate(normalized_url)
     if error:
         flash(error, 'error')
-        return render_template('index.html', user_input=url), 400
+        return render_template('index.html', user_input=url), 422
 
     with connection(DATABASE_URL) as conn:
         found_url = get_url_by_name(conn, normalized_url)
