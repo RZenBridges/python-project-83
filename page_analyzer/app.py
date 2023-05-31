@@ -24,6 +24,11 @@ def not_found(error):
     return render_template('not_found.html'), 404
 
 
+@app.errorhandler(500)
+def not_found(error):
+    return render_template('server_error.html'), 500
+
+
 # main page - GET
 @app.get('/')
 def index():
@@ -44,7 +49,7 @@ def add_url():
     with connection(DATABASE_URL) as conn:
         found_url = get_url_by_name(conn, normalized_url)
         if found_url:
-            id, name, created = found_url
+            id, *_ = found_url
             flash('Страница уже существует', 'success')
         else:
             id = add_to_urls(conn, normalized_url)
@@ -80,9 +85,8 @@ def check_url(id):
     with connection(DATABASE_URL) as conn:
         found_url = get_url_by_id(conn, id)
         if not found_url:
-            logging.warning(f"Cannot execute POST request argument '{id}'")
-            abort(404)
-        id, name, created_at = found_url
+            abort(500)
+        id, name, _ = found_url
         try:
             response = requests.get(name)
             response.raise_for_status()
