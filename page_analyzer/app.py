@@ -85,7 +85,7 @@ def check_url(id):
     with connection(DATABASE_URL) as conn:
         found_url = get_url_by_id(conn, id)
         if not found_url:
-            abort(500)
+            abort(404)
         try:
             response = requests.get(found_url.name)
             response.raise_for_status()
